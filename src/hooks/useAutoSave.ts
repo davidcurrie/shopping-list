@@ -11,6 +11,7 @@ export function useAutoSave() {
   const items = useShoppingStore((state) => state.items);
   const shops = useShoppingStore((state) => state.shops);
   const selection = useShoppingStore((state) => state.selection);
+  const homeCategories = useShoppingStore((state) => state.homeCategories);
   const fileHandle = useShoppingStore((state) => state.fileHandle);
   const saveStatus = useShoppingStore((state) => state.saveStatus);
   const setSaveStatus = useShoppingStore((state) => state.setSaveStatus);
@@ -31,7 +32,7 @@ export function useAutoSave() {
       try {
         setSaveStatus('saving');
 
-        const data = { items, shops, selection };
+        const data = { items, shops, selection, homeCategories };
         const content = yamlService.serialize(data);
         await fileSystemService.writeFile(fileHandle, content);
 
@@ -48,5 +49,5 @@ export function useAutoSave() {
         window.clearTimeout(saveTimeoutRef.current);
       }
     };
-  }, [items, shops, selection, fileHandle, saveStatus, setSaveStatus]);
+  }, [items, shops, selection, homeCategories, fileHandle, saveStatus, setSaveStatus]);
 }

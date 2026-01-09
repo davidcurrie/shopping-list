@@ -68,8 +68,9 @@ export function useFileSystem() {
       const items = useShoppingStore.getState().items;
       const shops = useShoppingStore.getState().shops;
       const selection = useShoppingStore.getState().selection;
+      const homeCategories = useShoppingStore.getState().homeCategories;
 
-      const data = { items, shops, selection };
+      const data = { items, shops, selection, homeCategories };
       const content = yamlService.serialize(data);
 
       await fileSystemService.writeFile(fileHandle, content);

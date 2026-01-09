@@ -114,6 +114,7 @@ export class YamlService {
       selection: {
         selectedItemIds: [],
       },
+      homeCategories: [],
     };
   }
 }
