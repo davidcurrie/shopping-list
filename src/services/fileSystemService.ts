@@ -117,6 +117,86 @@ export class FileSystemService {
   getFileName(handle: FileSystemFileHandle): string {
     return handle.name;
   }
+
+  /**
+   * Store file handle in IndexedDB for persistence across sessions
+   */
+  async storeFileHandle(handle: FileSystemFileHandle): Promise<void> {
+    try {
+      const db = await this.openDatabase();
+      const transaction = db.transaction(['fileHandles'], 'readwrite');
+      const store = transaction.objectStore('fileHandles');
+
+      return new Promise((resolve, reject) => {
+        const request = store.put({ id: 'lastFile', handle });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.warn('Failed to store file handle:', error);
+    }
+  }
+
+  /**
+   * Retrieve stored file handle from IndexedDB
+   */
+  async retrieveFileHandle(): Promise<FileSystemFileHandle | null> {
+    try {
+      const db = await this.openDatabase();
+      const transaction = db.transaction(['fileHandles'], 'readonly');
+      const store = transaction.objectStore('fileHandles');
+
+      return new Promise((resolve, reject) => {
+        const request = store.get('lastFile');
+        request.onsuccess = () => {
+          const result = request.result;
+          resolve(result?.handle || null);
+        };
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.warn('Failed to retrieve file handle:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Clear stored file handle
+   */
+  async clearFileHandle(): Promise<void> {
+    try {
+      const db = await this.openDatabase();
+      const transaction = db.transaction(['fileHandles'], 'readwrite');
+      const store = transaction.objectStore('fileHandles');
+
+      return new Promise((resolve, reject) => {
+        const request = store.delete('lastFile');
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    } catch (error) {
+      console.warn('Failed to clear file handle:', error);
+    }
+  }
+
+  /**
+   * Open IndexedDB database
+   */
+  private openDatabase(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('ShoppingListDB', 1);
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+        if (!db.objectStoreNames.contains('fileHandles')) {
+          db.createObjectStore('fileHandles', { keyPath: 'id' });
+        }
+      };
+    });
+  }
 }
 
 export const fileSystemService = new FileSystemService();

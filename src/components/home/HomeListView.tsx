@@ -22,7 +22,7 @@ import { groupItemsByHomeCategory } from '../../utils/categoryHelpers';
 import { CategoryGroup } from './CategoryGroup';
 import { fileSystemService } from '../../services/fileSystemService';
 import { yamlService } from '../../services/yamlService';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Item } from '../../types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 
@@ -66,6 +66,31 @@ export function HomeListView() {
   const categories = groupItemsByHomeCategory(filteredItems, homeCategories);
   const selectedCount = selectedItemIds.length;
 
+  // Restore file handle on mount
+  useEffect(() => {
+    const restoreFile = async () => {
+      if (fileHandle) return; // Already have a file handle
+
+      try {
+        const storedHandle = await fileSystemService.retrieveFileHandle();
+        if (storedHandle) {
+          // Try to read the file - this will also verify permissions
+          const content = await fileSystemService.readFile(storedHandle);
+          const data = yamlService.deserialize(content);
+          loadData(data);
+          setFileHandle(storedHandle);
+        }
+      } catch (err) {
+        // If we can't restore the file (permissions denied, file deleted, etc.),
+        // just clear the stored handle and show the file picker
+        console.warn('Failed to restore file:', err);
+        await fileSystemService.clearFileHandle();
+      }
+    };
+
+    restoreFile();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleOpenFile = async () => {
     try {
       setError(null);
@@ -74,6 +99,8 @@ export function HomeListView() {
       const data = yamlService.deserialize(content);
       loadData(data);
       setFileHandle(handle);
+      // Store the handle for next time
+      await fileSystemService.storeFileHandle(handle);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -92,6 +119,8 @@ export function HomeListView() {
       await fileSystemService.writeFile(handle, content);
       loadData(defaultData);
       setFileHandle(handle);
+      // Store the handle for next time
+      await fileSystemService.storeFileHandle(handle);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
