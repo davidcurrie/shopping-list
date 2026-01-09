@@ -398,16 +398,42 @@ export function HomeListView() {
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
-          <TextField
-            margin="dense"
-            label="Home Category"
-            fullWidth
+          <Autocomplete
+            freeSolo
+            options={homeCategories || []}
             value={formData.homeCategory}
-            onChange={(e) =>
-              setFormData({ ...formData, homeCategory: e.target.value })
-            }
-            required
-            helperText="e.g., Fridge, Cupboard, Vegetable drawer"
+            onChange={(_, newValue) => {
+              setFormData({ ...formData, homeCategory: newValue || '' });
+            }}
+            onInputChange={(_, newInputValue) => {
+              setFormData({ ...formData, homeCategory: newInputValue });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                margin="dense"
+                label="Home Category"
+                required
+                helperText="Select existing or type to create new"
+              />
+            )}
+          />
+          <Autocomplete
+            multiple
+            options={shops}
+            getOptionLabel={(option) => option.name}
+            value={shops.filter(shop => selectedShopIds.includes(shop.id))}
+            onChange={(_, newValue) => {
+              setSelectedShopIds(newValue.map(shop => shop.id));
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                margin="dense"
+                label="Available at Shops"
+                helperText="Select which shops carry this item"
+              />
+            )}
           />
           <TextField
             margin="dense"
@@ -426,11 +452,11 @@ export function HomeListView() {
               onClick={() => setDeleteConfirm(editingItem.id)}
               color="error"
               startIcon={<DeleteIcon />}
-              sx={{ mr: 'auto' }}
             >
               Delete
             </Button>
           )}
+          <Box sx={{ flex: 1 }} />
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
           <Button
             onClick={handleSaveItem}
