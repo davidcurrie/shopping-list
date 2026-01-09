@@ -6,16 +6,22 @@ import {
   List,
   Box,
   Chip,
+  IconButton,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { HomeCategory, Item } from '../../types';
 import { ItemRow } from './ItemRow';
+import { useShoppingStore } from '../../store/shoppingStore';
 
 interface CategoryGroupProps {
   category: HomeCategory;
   selectedItemIds: string[];
   onToggleItem: (itemId: string) => void;
   onEditItem: (item: Item) => void;
+  isFirst: boolean;
+  isLast: boolean;
   defaultExpanded?: boolean;
 }
 
@@ -24,11 +30,26 @@ export function CategoryGroup({
   selectedItemIds,
   onToggleItem,
   onEditItem,
+  isFirst,
+  isLast,
   defaultExpanded = true,
 }: CategoryGroupProps) {
+  const moveHomeCategoryUp = useShoppingStore((state) => state.moveHomeCategoryUp);
+  const moveHomeCategoryDown = useShoppingStore((state) => state.moveHomeCategoryDown);
+
   const selectedCount = category.items.filter((item) =>
     selectedItemIds.includes(item.id)
   ).length;
+
+  const handleMoveUp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    moveHomeCategoryUp(category.name);
+  };
+
+  const handleMoveDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    moveHomeCategoryDown(category.name);
+  };
 
   return (
     <Accordion defaultExpanded={defaultExpanded}>
@@ -42,7 +63,27 @@ export function CategoryGroup({
             pr: 2,
           }}
         >
-          <Typography variant="h6">{category.name}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box>
+              <IconButton
+                size="small"
+                onClick={handleMoveUp}
+                disabled={isFirst}
+                sx={{ p: 0.5 }}
+              >
+                <ArrowUpwardIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={handleMoveDown}
+                disabled={isLast}
+                sx={{ p: 0.5 }}
+              >
+                <ArrowDownwardIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <Typography variant="h6">{category.name}</Typography>
+          </Box>
           {selectedCount > 0 && (
             <Chip
               label={`${selectedCount}/${category.items.length}`}

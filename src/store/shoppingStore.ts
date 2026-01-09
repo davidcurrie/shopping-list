@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Item, Shop, ShoppingListData, SaveStatus } from '../types';
+import { getUniqueHomeCategories, getUniqueShopCategories, ensureCategoryOrder } from '../utils/categoryHelpers';
 
 interface ShoppingStore extends ShoppingListData {
   // File handle state
@@ -33,6 +34,12 @@ interface ShoppingStore extends ShoppingListData {
   ) => void;
   removeItemFromShop: (itemId: string, shopId: string) => void;
 
+  // Category ordering
+  moveHomeCategoryUp: (categoryName: string) => void;
+  moveHomeCategoryDown: (categoryName: string) => void;
+  moveShopCategoryUp: (shopId: string, categoryName: string) => void;
+  moveShopCategoryDown: (shopId: string, categoryName: string) => void;
+
   // Data persistence
   loadData: (data: ShoppingListData) => void;
   reset: () => void;
@@ -49,6 +56,7 @@ const initialState: ShoppingListData = {
   selection: {
     selectedItemIds: [],
   },
+  homeCategoryOrder: [],
 };
 
 export const useShoppingStore = create<ShoppingStore>((set, get) => ({
@@ -106,8 +114,15 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
         ...item,
         id: crypto.randomUUID(),
       };
+      const newItems = [...state.items, newItem];
+
+      // Ensure category order includes the new category
+      const homeCategories = getUniqueHomeCategories(newItems);
+      const homeCategoryOrder = ensureCategoryOrder(homeCategories, state.homeCategoryOrder);
+
       return {
-        items: [...state.items, newItem],
+        items: newItems,
+        homeCategoryOrder,
         // Auto-select new items
         selection: {
           selectedItemIds: [...state.selection.selectedItemIds, newItem.id],
@@ -171,8 +186,8 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
 
   // Shop availability
   setItemShopAvailability: (itemId, shopId, category) =>
-    set((state) => ({
-      items: state.items.map((item) => {
+    set((state) => {
+      const updatedItems = state.items.map((item) => {
         if (item.id !== itemId) return item;
 
         // Remove existing availability for this shop and add new one
@@ -187,9 +202,24 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
             { shopId, shopCategory: category },
           ],
         };
-      }),
-      saveStatus: 'unsaved',
-    })),
+      });
+
+      // Ensure shop category order includes the new category
+      const shopCategories = getUniqueShopCategories(updatedItems, shopId);
+      const updatedShops = state.shops.map((shop) => {
+        if (shop.id !== shopId) return shop;
+        return {
+          ...shop,
+          categoryOrder: ensureCategoryOrder(shopCategories, shop.categoryOrder),
+        };
+      });
+
+      return {
+        items: updatedItems,
+        shops: updatedShops,
+        saveStatus: 'unsaved',
+      };
+    }),
 
   removeItemFromShop: (itemId, shopId) =>
     set((state) => ({
@@ -206,14 +236,112 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
       saveStatus: 'unsaved',
     })),
 
+  // Category ordering
+  moveHomeCategoryUp: (categoryName) =>
+    set((state) => {
+      const categoryOrder = state.homeCategoryOrder || [];
+      const currentIndex = categoryOrder.findIndex((c) => c.name === categoryName);
+
+      if (currentIndex <= 0) return state;
+
+      const newOrder = [...categoryOrder];
+      const temp = newOrder[currentIndex].order;
+      newOrder[currentIndex].order = newOrder[currentIndex - 1].order;
+      newOrder[currentIndex - 1].order = temp;
+
+      return {
+        homeCategoryOrder: newOrder,
+        saveStatus: 'unsaved',
+      };
+    }),
+
+  moveHomeCategoryDown: (categoryName) =>
+    set((state) => {
+      const categoryOrder = state.homeCategoryOrder || [];
+      const currentIndex = categoryOrder.findIndex((c) => c.name === categoryName);
+
+      if (currentIndex < 0 || currentIndex >= categoryOrder.length - 1) return state;
+
+      const newOrder = [...categoryOrder];
+      const temp = newOrder[currentIndex].order;
+      newOrder[currentIndex].order = newOrder[currentIndex + 1].order;
+      newOrder[currentIndex + 1].order = temp;
+
+      return {
+        homeCategoryOrder: newOrder,
+        saveStatus: 'unsaved',
+      };
+    }),
+
+  moveShopCategoryUp: (shopId, categoryName) =>
+    set((state) => ({
+      shops: state.shops.map((shop) => {
+        if (shop.id !== shopId) return shop;
+
+        const categoryOrder = shop.categoryOrder || [];
+        const currentIndex = categoryOrder.findIndex((c) => c.name === categoryName);
+
+        if (currentIndex <= 0) return shop;
+
+        const newOrder = [...categoryOrder];
+        const temp = newOrder[currentIndex].order;
+        newOrder[currentIndex].order = newOrder[currentIndex - 1].order;
+        newOrder[currentIndex - 1].order = temp;
+
+        return {
+          ...shop,
+          categoryOrder: newOrder,
+        };
+      }),
+      saveStatus: 'unsaved',
+    })),
+
+  moveShopCategoryDown: (shopId, categoryName) =>
+    set((state) => ({
+      shops: state.shops.map((shop) => {
+        if (shop.id !== shopId) return shop;
+
+        const categoryOrder = shop.categoryOrder || [];
+        const currentIndex = categoryOrder.findIndex((c) => c.name === categoryName);
+
+        if (currentIndex < 0 || currentIndex >= categoryOrder.length - 1) return shop;
+
+        const newOrder = [...categoryOrder];
+        const temp = newOrder[currentIndex].order;
+        newOrder[currentIndex].order = newOrder[currentIndex + 1].order;
+        newOrder[currentIndex + 1].order = temp;
+
+        return {
+          ...shop,
+          categoryOrder: newOrder,
+        };
+      }),
+      saveStatus: 'unsaved',
+    })),
+
   // Data persistence
-  loadData: (data) =>
+  loadData: (data) => {
+    // Ensure all categories have orders
+    const homeCategories = getUniqueHomeCategories(data.items);
+    const homeCategoryOrder = ensureCategoryOrder(homeCategories, data.homeCategoryOrder);
+
+    // Ensure shop category orders
+    const shops = data.shops.map((shop) => {
+      const shopCategories = getUniqueShopCategories(data.items, shop.id);
+      return {
+        ...shop,
+        categoryOrder: ensureCategoryOrder(shopCategories, shop.categoryOrder),
+      };
+    });
+
     set({
       items: data.items,
-      shops: data.shops,
+      shops,
       selection: data.selection,
+      homeCategoryOrder,
       saveStatus: 'saved',
-    }),
+    });
+  },
 
   reset: () =>
     set({

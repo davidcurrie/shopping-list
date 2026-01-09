@@ -66,10 +66,40 @@ items:
 shops:
   - id: sainsburys
     name: Sainsburys
+    categoryOrder:
+      - name: Dairy
+        order: 1
+      - name: Meat
+        order: 2
+      - name: Snacks
+        order: 3
+      - name: Cereals
+        order: 4
+      - name: Vegetables
+        order: 5
   - id: tesco
     name: Tesco
+    categoryOrder:
+      - name: Dairy
+        order: 1
+      - name: Meat
+        order: 2
+      - name: Breakfast
+        order: 3
+      - name: Fresh Produce
+        order: 4
   - id: greengrocers
     name: Local Greengrocers
+    categoryOrder:
+      - name: Uncategorized
+        order: 1
+homeCategoryOrder:
+  - name: Fridge
+    order: 1
+  - name: Cupboard 1
+    order: 2
+  - name: Vegetable drawer
+    order: 3
 selection:
   selectedItemIds:
     - chicken

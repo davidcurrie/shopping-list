@@ -71,6 +71,11 @@ npm run deploy
 - Add which shops carry that item
 - Assign shop-specific categories (e.g., "Dairy" at Sainsburys)
 
+**Reordering Categories**
+- Use the **up/down arrow buttons** in category headers to reorder them
+- Works in both Home List and Shop views
+- Custom order is automatically saved to your YAML file
+
 ### At Home
 
 **Home List View**
@@ -111,6 +116,17 @@ items:
 shops:
   - id: sainsburys
     name: Sainsburys
+    categoryOrder:
+      - name: Dairy
+        order: 1
+      - name: Meat
+        order: 2
+
+homeCategoryOrder:
+  - name: Fridge
+    order: 1
+  - name: Cupboard 1
+    order: 2
 
 selection:
   selectedItemIds:

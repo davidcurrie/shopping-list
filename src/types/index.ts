@@ -12,9 +12,15 @@ export interface ShopAvailability {
   shopCategory: string;
 }
 
+export interface CategoryOrder {
+  name: string;
+  order: number;
+}
+
 export interface Shop {
   id: string;
   name: string;
+  categoryOrder?: CategoryOrder[];
 }
 
 export interface SelectionState {
@@ -26,6 +32,7 @@ export interface ShoppingListData {
   items: Item[];
   shops: Shop[];
   selection: SelectionState;
+  homeCategoryOrder?: CategoryOrder[];
 }
 
 // UI-specific types for organizing items by category

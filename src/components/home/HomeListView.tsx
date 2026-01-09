@@ -48,7 +48,8 @@ export function HomeListView() {
   });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const categories = groupItemsByHomeCategory(items);
+  const homeCategoryOrder = useShoppingStore((state) => state.homeCategoryOrder);
+  const categories = groupItemsByHomeCategory(items, homeCategoryOrder);
   const selectedCount = selectedItemIds.length;
 
   const handleOpenFile = async () => {
@@ -277,13 +278,15 @@ export function HomeListView() {
         </Typography>
       </Box>
 
-      {categories.map((category) => (
+      {categories.map((category, index) => (
         <CategoryGroup
           key={category.name}
           category={category}
           selectedItemIds={selectedItemIds}
           onToggleItem={toggleItemSelection}
           onEditItem={handleEditItem}
+          isFirst={index === 0}
+          isLast={index === categories.length - 1}
         />
       ))}
 

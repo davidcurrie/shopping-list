@@ -37,7 +37,7 @@ export function ShopListView() {
   const selectedItems = items.filter((item) =>
     selectedItemIds.includes(item.id)
   );
-  const categories = groupItemsByShopCategory(items, shopId);
+  const categories = groupItemsByShopCategory(items, shop);
 
   const remainingCount = selectedItems.length;
   const totalCount = items.length;
@@ -113,12 +113,15 @@ export function ShopListView() {
         </Typography>
       </Box>
 
-      {categories.map((category) => (
+      {categories.map((category, index) => (
         <ShopCategoryGroup
           key={category.name}
           category={category}
+          shopId={shopId}
           selectedItemIds={selectedItemIds}
           onToggleItem={toggleItemSelection}
+          isFirst={index === 0}
+          isLast={index === categories.length - 1}
         />
       ))}
     </Box>
