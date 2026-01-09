@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Item, Shop, ShoppingListData, SaveStatus } from '../types';
-import { getUniqueHomeCategories, getUniqueShopCategories, ensureCategoryOrder } from '../utils/categoryHelpers';
+import { getUniqueHomeCategories, getUniqueShopCategories, ensureCategories } from '../utils/categoryHelpers';
 
 interface ShoppingStore extends ShoppingListData {
   // File handle state
@@ -56,7 +56,7 @@ const initialState: ShoppingListData = {
   selection: {
     selectedItemIds: [],
   },
-  homeCategoryOrder: [],
+  homeCategories: [],
 };
 
 export const useShoppingStore = create<ShoppingStore>((set, get) => ({
@@ -116,13 +116,13 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
       };
       const newItems = [...state.items, newItem];
 
-      // Ensure category order includes the new category
-      const homeCategories = getUniqueHomeCategories(newItems);
-      const homeCategoryOrder = ensureCategoryOrder(homeCategories, state.homeCategoryOrder);
+      // Ensure category list includes the new category
+      const uniqueHomeCategories = getUniqueHomeCategories(newItems);
+      const homeCategories = ensureCategories(uniqueHomeCategories, state.homeCategories);
 
       return {
         items: newItems,
-        homeCategoryOrder,
+        homeCategories,
         // Auto-select new items
         selection: {
           selectedItemIds: [...state.selection.selectedItemIds, newItem.id],
@@ -204,13 +204,13 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
         };
       });
 
-      // Ensure shop category order includes the new category
-      const shopCategories = getUniqueShopCategories(updatedItems, shopId);
+      // Ensure shop category list includes the new category
+      const uniqueShopCategories = getUniqueShopCategories(updatedItems, shopId);
       const updatedShops = state.shops.map((shop) => {
         if (shop.id !== shopId) return shop;
         return {
           ...shop,
-          categoryOrder: ensureCategoryOrder(shopCategories, shop.categoryOrder),
+          categories: ensureCategories(uniqueShopCategories, shop.categories),
         };
       });
 
@@ -239,36 +239,36 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
   // Category ordering
   moveHomeCategoryUp: (categoryName) =>
     set((state) => {
-      const categoryOrder = state.homeCategoryOrder || [];
-      const currentIndex = categoryOrder.findIndex((c) => c.name === categoryName);
+      const categories = state.homeCategories || [];
+      const currentIndex = categories.indexOf(categoryName);
 
       if (currentIndex <= 0) return state;
 
-      const newOrder = [...categoryOrder];
-      const temp = newOrder[currentIndex].order;
-      newOrder[currentIndex].order = newOrder[currentIndex - 1].order;
-      newOrder[currentIndex - 1].order = temp;
+      // Swap with the category above
+      const newCategories = [...categories];
+      [newCategories[currentIndex - 1], newCategories[currentIndex]] =
+        [newCategories[currentIndex], newCategories[currentIndex - 1]];
 
       return {
-        homeCategoryOrder: newOrder,
+        homeCategories: newCategories,
         saveStatus: 'unsaved',
       };
     }),
 
   moveHomeCategoryDown: (categoryName) =>
     set((state) => {
-      const categoryOrder = state.homeCategoryOrder || [];
-      const currentIndex = categoryOrder.findIndex((c) => c.name === categoryName);
+      const categories = state.homeCategories || [];
+      const currentIndex = categories.indexOf(categoryName);
 
-      if (currentIndex < 0 || currentIndex >= categoryOrder.length - 1) return state;
+      if (currentIndex < 0 || currentIndex >= categories.length - 1) return state;
 
-      const newOrder = [...categoryOrder];
-      const temp = newOrder[currentIndex].order;
-      newOrder[currentIndex].order = newOrder[currentIndex + 1].order;
-      newOrder[currentIndex + 1].order = temp;
+      // Swap with the category below
+      const newCategories = [...categories];
+      [newCategories[currentIndex], newCategories[currentIndex + 1]] =
+        [newCategories[currentIndex + 1], newCategories[currentIndex]];
 
       return {
-        homeCategoryOrder: newOrder,
+        homeCategories: newCategories,
         saveStatus: 'unsaved',
       };
     }),
@@ -278,19 +278,19 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
       shops: state.shops.map((shop) => {
         if (shop.id !== shopId) return shop;
 
-        const categoryOrder = shop.categoryOrder || [];
-        const currentIndex = categoryOrder.findIndex((c) => c.name === categoryName);
+        const categories = shop.categories || [];
+        const currentIndex = categories.indexOf(categoryName);
 
         if (currentIndex <= 0) return shop;
 
-        const newOrder = [...categoryOrder];
-        const temp = newOrder[currentIndex].order;
-        newOrder[currentIndex].order = newOrder[currentIndex - 1].order;
-        newOrder[currentIndex - 1].order = temp;
+        // Swap with the category above
+        const newCategories = [...categories];
+        [newCategories[currentIndex - 1], newCategories[currentIndex]] =
+          [newCategories[currentIndex], newCategories[currentIndex - 1]];
 
         return {
           ...shop,
-          categoryOrder: newOrder,
+          categories: newCategories,
         };
       }),
       saveStatus: 'unsaved',
@@ -301,19 +301,19 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
       shops: state.shops.map((shop) => {
         if (shop.id !== shopId) return shop;
 
-        const categoryOrder = shop.categoryOrder || [];
-        const currentIndex = categoryOrder.findIndex((c) => c.name === categoryName);
+        const categories = shop.categories || [];
+        const currentIndex = categories.indexOf(categoryName);
 
-        if (currentIndex < 0 || currentIndex >= categoryOrder.length - 1) return shop;
+        if (currentIndex < 0 || currentIndex >= categories.length - 1) return shop;
 
-        const newOrder = [...categoryOrder];
-        const temp = newOrder[currentIndex].order;
-        newOrder[currentIndex].order = newOrder[currentIndex + 1].order;
-        newOrder[currentIndex + 1].order = temp;
+        // Swap with the category below
+        const newCategories = [...categories];
+        [newCategories[currentIndex], newCategories[currentIndex + 1]] =
+          [newCategories[currentIndex + 1], newCategories[currentIndex]];
 
         return {
           ...shop,
-          categoryOrder: newOrder,
+          categories: newCategories,
         };
       }),
       saveStatus: 'unsaved',
@@ -321,16 +321,16 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
 
   // Data persistence
   loadData: (data) => {
-    // Ensure all categories have orders
-    const homeCategories = getUniqueHomeCategories(data.items);
-    const homeCategoryOrder = ensureCategoryOrder(homeCategories, data.homeCategoryOrder);
+    // Ensure all categories are in the list
+    const uniqueHomeCategories = getUniqueHomeCategories(data.items);
+    const homeCategories = ensureCategories(uniqueHomeCategories, data.homeCategories);
 
-    // Ensure shop category orders
+    // Ensure shop categories
     const shops = data.shops.map((shop) => {
-      const shopCategories = getUniqueShopCategories(data.items, shop.id);
+      const uniqueShopCategories = getUniqueShopCategories(data.items, shop.id);
       return {
         ...shop,
-        categoryOrder: ensureCategoryOrder(shopCategories, shop.categoryOrder),
+        categories: ensureCategories(uniqueShopCategories, shop.categories),
       };
     });
 
@@ -338,7 +338,7 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
       items: data.items,
       shops,
       selection: data.selection,
-      homeCategoryOrder,
+      homeCategories,
       saveStatus: 'saved',
     });
   },

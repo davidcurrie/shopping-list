@@ -116,17 +116,13 @@ items:
 shops:
   - id: sainsburys
     name: Sainsburys
-    categoryOrder:
-      - name: Dairy
-        order: 1
-      - name: Meat
-        order: 2
+    categories:
+      - Dairy
+      - Meat
 
-homeCategoryOrder:
-  - name: Fridge
-    order: 1
-  - name: Cupboard 1
-    order: 2
+homeCategories:
+  - Fridge
+  - Cupboard 1
 
 selection:
   selectedItemIds:

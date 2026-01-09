@@ -48,8 +48,8 @@ export function HomeListView() {
   });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const homeCategoryOrder = useShoppingStore((state) => state.homeCategoryOrder);
-  const categories = groupItemsByHomeCategory(items, homeCategoryOrder);
+  const homeCategories = useShoppingStore((state) => state.homeCategories);
+  const categories = groupItemsByHomeCategory(items, homeCategories);
   const selectedCount = selectedItemIds.length;
 
   const handleOpenFile = async () => {

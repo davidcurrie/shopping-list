@@ -1,11 +1,11 @@
-import { Item, HomeCategory, ShopCategory, CategoryOrder, Shop } from '../types';
+import { Item, HomeCategory, ShopCategory, Shop } from '../types';
 
 /**
  * Group items by their home category and sort according to custom order
  */
 export function groupItemsByHomeCategory(
   items: Item[],
-  categoryOrder?: CategoryOrder[]
+  categories?: string[]
 ): HomeCategory[] {
   const categoryMap = new Map<string, Item[]>();
 
@@ -18,27 +18,32 @@ export function groupItemsByHomeCategory(
   });
 
   // Convert map to array
-  const categories = Array.from(categoryMap.entries()).map(([name, items]) => ({
+  const categoryGroups = Array.from(categoryMap.entries()).map(([name, items]) => ({
     name,
     items,
   }));
 
   // Sort by custom order if provided, otherwise alphabetically
-  if (categoryOrder && categoryOrder.length > 0) {
-    const orderMap = new Map(categoryOrder.map((c) => [c.name, c.order]));
+  if (categories && categories.length > 0) {
+    return categoryGroups.sort((a, b) => {
+      const indexA = categories.indexOf(a.name);
+      const indexB = categories.indexOf(b.name);
 
-    return categories.sort((a, b) => {
-      const orderA = orderMap.get(a.name) ?? Number.MAX_SAFE_INTEGER;
-      const orderB = orderMap.get(b.name) ?? Number.MAX_SAFE_INTEGER;
-
-      if (orderA === orderB) {
-        return a.name.localeCompare(b.name);
+      // If both are in the custom order, use that order
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
       }
-      return orderA - orderB;
+
+      // If only one is in the custom order, it comes first
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+
+      // Neither in custom order, sort alphabetically
+      return a.name.localeCompare(b.name);
     });
   }
 
-  return categories.sort((a, b) => a.name.localeCompare(b.name));
+  return categoryGroups.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /**
@@ -65,28 +70,33 @@ export function groupItemsByShopCategory(
   });
 
   // Convert map to array
-  const categories = Array.from(categoryMap.entries()).map(([name, items]) => ({
+  const categoryGroups = Array.from(categoryMap.entries()).map(([name, items]) => ({
     name,
     items,
   }));
 
   // Sort by custom order if provided, otherwise alphabetically
-  const categoryOrder = shop.categoryOrder;
-  if (categoryOrder && categoryOrder.length > 0) {
-    const orderMap = new Map(categoryOrder.map((c) => [c.name, c.order]));
+  const categories = shop.categories;
+  if (categories && categories.length > 0) {
+    return categoryGroups.sort((a, b) => {
+      const indexA = categories.indexOf(a.name);
+      const indexB = categories.indexOf(b.name);
 
-    return categories.sort((a, b) => {
-      const orderA = orderMap.get(a.name) ?? Number.MAX_SAFE_INTEGER;
-      const orderB = orderMap.get(b.name) ?? Number.MAX_SAFE_INTEGER;
-
-      if (orderA === orderB) {
-        return a.name.localeCompare(b.name);
+      // If both are in the custom order, use that order
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
       }
-      return orderA - orderB;
+
+      // If only one is in the custom order, it comes first
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+
+      // Neither in custom order, sort alphabetically
+      return a.name.localeCompare(b.name);
     });
   }
 
-  return categories.sort((a, b) => a.name.localeCompare(b.name));
+  return categoryGroups.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /**
@@ -119,32 +129,20 @@ export function getUniqueShopCategories(
 }
 
 /**
- * Ensure all categories have an order. Create orders for new categories.
+ * Ensure all categories are in the list. Add new categories to the end.
  */
-export function ensureCategoryOrder(
+export function ensureCategories(
   categoryNames: string[],
-  existingOrder?: CategoryOrder[]
-): CategoryOrder[] {
-  const orderMap = new Map(
-    (existingOrder || []).map((c) => [c.name, c.order])
-  );
+  existingCategories?: string[]
+): string[] {
+  const result = [...(existingCategories || [])];
+  const existingSet = new Set(result);
 
-  const maxOrder = existingOrder && existingOrder.length > 0
-    ? Math.max(...existingOrder.map((c) => c.order))
-    : 0;
-
-  let nextOrder = maxOrder + 1;
-  const result: CategoryOrder[] = [];
-
-  // Add existing orders
-  if (existingOrder) {
-    result.push(...existingOrder);
-  }
-
-  // Add new categories
+  // Add new categories to the end
   categoryNames.forEach((name) => {
-    if (!orderMap.has(name)) {
-      result.push({ name, order: nextOrder++ });
+    if (!existingSet.has(name)) {
+      result.push(name);
+      existingSet.add(name);
     }
   });
 
