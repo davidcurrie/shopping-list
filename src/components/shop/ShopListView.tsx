@@ -1,6 +1,7 @@
-import { Box, Typography, Button, Paper, Alert } from '@mui/material';
+import { Box, Typography, Button, Paper, Alert, FormControlLabel, Switch } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useShoppingStore } from '../../store/shoppingStore';
 import { groupItemsByShopCategory } from '../../utils/categoryHelpers';
 import { ShopCategoryGroup } from './ShopCategoryGroup';
@@ -8,13 +9,14 @@ import { ShopCategoryGroup } from './ShopCategoryGroup';
 export function ShopListView() {
   const { shopId } = useParams<{ shopId: string }>();
   const navigate = useNavigate();
+  const [showUnselected, setShowUnselected] = useState(false);
 
   const shop = useShoppingStore((state) =>
     state.shops.find((s) => s.id === shopId)
   );
   const getItemsForShop = useShoppingStore((state) => state.getItemsForShop);
   const selectedItemIds = useShoppingStore(
-    (state) => state.selection.selectedItemIds
+    (state) => state.selection
   );
   const toggleItemSelection = useShoppingStore((state) => state.toggleItemSelection);
 
@@ -33,14 +35,20 @@ export function ShopListView() {
     );
   }
 
-  const items = getItemsForShop(shopId, false);
-  const selectedItems = items.filter((item) =>
+  const allItems = getItemsForShop(shopId, false);
+
+  // Filter items based on showUnselected toggle
+  const filteredItems = showUnselected
+    ? allItems
+    : allItems.filter((item) => selectedItemIds.includes(item.id));
+
+  const selectedItems = allItems.filter((item) =>
     selectedItemIds.includes(item.id)
   );
-  const categories = groupItemsByShopCategory(items, shop);
+  const categories = groupItemsByShopCategory(filteredItems, shop);
 
   const remainingCount = selectedItems.length;
-  const totalCount = items.length;
+  const totalCount = allItems.length;
 
   const handleBack = () => {
     navigate('/shops');
@@ -111,6 +119,16 @@ export function ShopListView() {
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
           Check/uncheck items as you add them to your basket
         </Typography>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showUnselected}
+              onChange={(e) => setShowUnselected(e.target.checked)}
+            />
+          }
+          label="Show unselected items"
+          sx={{ mt: 1 }}
+        />
       </Box>
 
       {categories.map((category, index) => (

@@ -18,15 +18,11 @@ export interface Shop {
   categories?: string[];
 }
 
-export interface SelectionState {
-  selectedItemIds: string[];
-}
-
 // Root data structure - this is what gets saved to YAML
 export interface ShoppingListData {
   items: Item[];
   shops: Shop[];
-  selection: SelectionState;
+  selection: string[];
   homeCategories?: string[];
 }
 

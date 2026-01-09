@@ -83,14 +83,13 @@ shops:
     name: Local Greengrocers
     categories:
       - Uncategorized
+selection:
+  - chicken
+  - digestives
+  - carrots
+  - porridge
+  - butter
 homeCategories:
   - Fridge
   - Cupboard 1
   - Vegetable drawer
-selection:
-  selectedItemIds:
-    - chicken
-    - digestives
-    - carrots
-    - butter
-    - porridge

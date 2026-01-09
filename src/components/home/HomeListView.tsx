@@ -10,6 +10,8 @@ import {
   DialogActions,
   TextField,
   Fab,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,7 +28,7 @@ import { ConfirmDialog } from '../common/ConfirmDialog';
 export function HomeListView() {
   const items = useShoppingStore((state) => state.items);
   const selectedItemIds = useShoppingStore(
-    (state) => state.selection.selectedItemIds
+    (state) => state.selection
   );
   const toggleItemSelection = useShoppingStore(
     (state) => state.toggleItemSelection
@@ -47,9 +49,16 @@ export function HomeListView() {
     notes: '',
   });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [showUnselected, setShowUnselected] = useState(true);
 
   const homeCategories = useShoppingStore((state) => state.homeCategories);
-  const categories = groupItemsByHomeCategory(items, homeCategories);
+
+  // Filter items based on showUnselected toggle
+  const filteredItems = showUnselected
+    ? items
+    : items.filter(item => selectedItemIds.includes(item.id));
+
+  const categories = groupItemsByHomeCategory(filteredItems, homeCategories);
   const selectedCount = selectedItemIds.length;
 
   const handleOpenFile = async () => {
@@ -267,15 +276,26 @@ export function HomeListView() {
 
   return (
     <Box>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">
-          Home List
-          {selectedCount > 0 && (
-            <Typography component="span" variant="h6" color="primary" sx={{ ml: 2 }}>
-              ({selectedCount} selected)
-            </Typography>
-          )}
-        </Typography>
+      <Box sx={{ mb: 3 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="h5">
+            Home List
+            {selectedCount > 0 && (
+              <Typography component="span" variant="h6" color="primary" sx={{ ml: 2 }}>
+                ({selectedCount} selected)
+              </Typography>
+            )}
+          </Typography>
+        </Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showUnselected}
+              onChange={(e) => setShowUnselected(e.target.checked)}
+            />
+          }
+          label="Show unselected items"
+        />
       </Box>
 
       {categories.map((category, index) => (

@@ -53,9 +53,7 @@ interface ShoppingStore extends ShoppingListData {
 const initialState: ShoppingListData = {
   items: [],
   shops: [],
-  selection: {
-    selectedItemIds: [],
-  },
+  selection: [],
   homeCategories: [],
 };
 
@@ -71,38 +69,32 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
   // Selection actions
   toggleItemSelection: (itemId) =>
     set((state) => {
-      const selectedIds = state.selection.selectedItemIds;
+      const selectedIds = state.selection;
       const isSelected = selectedIds.includes(itemId);
 
       return {
-        selection: {
-          selectedItemIds: isSelected
-            ? selectedIds.filter((id) => id !== itemId)
-            : [...selectedIds, itemId],
-        },
+        selection: isSelected
+          ? selectedIds.filter((id) => id !== itemId)
+          : [...selectedIds, itemId],
         saveStatus: 'unsaved',
       };
     }),
 
   deselectItem: (itemId) =>
     set((state) => ({
-      selection: {
-        selectedItemIds: state.selection.selectedItemIds.filter(
-          (id) => id !== itemId
-        ),
-      },
+      selection: state.selection.filter(
+        (id) => id !== itemId
+      ),
       saveStatus: 'unsaved',
     })),
 
   selectItem: (itemId) =>
     set((state) => {
-      if (state.selection.selectedItemIds.includes(itemId)) {
+      if (state.selection.includes(itemId)) {
         return state;
       }
       return {
-        selection: {
-          selectedItemIds: [...state.selection.selectedItemIds, itemId],
-        },
+        selection: [...state.selection, itemId],
         saveStatus: 'unsaved',
       };
     }),
@@ -124,9 +116,7 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
         items: newItems,
         homeCategories,
         // Auto-select new items
-        selection: {
-          selectedItemIds: [...state.selection.selectedItemIds, newItem.id],
-        },
+        selection: [...state.selection, newItem.id],
         saveStatus: 'unsaved',
       };
     }),
@@ -142,11 +132,9 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
   deleteItem: (itemId) =>
     set((state) => ({
       items: state.items.filter((item) => item.id !== itemId),
-      selection: {
-        selectedItemIds: state.selection.selectedItemIds.filter(
-          (id) => id !== itemId
-        ),
-      },
+      selection: state.selection.filter(
+        (id) => id !== itemId
+      ),
       saveStatus: 'unsaved',
     })),
 
@@ -367,7 +355,7 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
 
       // If selectedOnly, also check if item is selected
       if (selectedOnly) {
-        return state.selection.selectedItemIds.includes(item.id);
+        return state.selection.includes(item.id);
       }
 
       return true;

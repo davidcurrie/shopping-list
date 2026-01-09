@@ -120,13 +120,12 @@ shops:
       - Dairy
       - Meat
 
+selection:
+  - butter
+
 homeCategories:
   - Fridge
   - Cupboard 1
-
-selection:
-  selectedItemIds:
-    - butter
 ```
 
 You can edit this file manually if needed!
