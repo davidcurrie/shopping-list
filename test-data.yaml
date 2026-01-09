@@ -44,13 +44,11 @@ items:
     homeCategory: Cupboard 1
     shopAvailability:
       - shopId: sainsburys
-        shopCategory: Snacks
   - id: carrots
     name: Carrots
     homeCategory: Vegetable drawer
     shopAvailability:
       - shopId: greengrocers
-        shopCategory: Uncategorized
       - shopId: sainsburys
         shopCategory: Vegetables
       - shopId: tesco
@@ -81,8 +79,6 @@ shops:
       - Fresh Produce
   - id: greengrocers
     name: Local Greengrocers
-    categories:
-      - Uncategorized
 selection:
   - chicken
   - digestives
