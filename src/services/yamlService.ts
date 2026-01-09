@@ -49,14 +49,8 @@ export class YamlService {
       throw new Error('Invalid data: shops must be an array');
     }
 
-    if (!data.selection || typeof data.selection !== 'object') {
-      throw new Error('Invalid data: selection must be an object');
-    }
-
-    if (!Array.isArray(data.selection.selectedItemIds)) {
-      throw new Error(
-        'Invalid data: selection.selectedItemIds must be an array'
-      );
+    if (!Array.isArray(data.selection)) {
+      throw new Error('Invalid data: selection must be an array');
     }
 
     // Validate items structure

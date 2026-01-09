@@ -117,7 +117,7 @@ export function ShopListView() {
           </Typography>
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Check/uncheck items as you add them to your basket
+          Uncheck items as you add them to your basket
         </Typography>
         <FormControlLabel
           control={
