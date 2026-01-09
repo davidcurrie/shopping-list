@@ -21,7 +21,7 @@ interface AppDrawerProps {
 const drawerWidth = 240;
 
 const menuItems = [
-  { text: 'Home List', icon: <HomeIcon />, path: '/' },
+  { text: 'Home', icon: <HomeIcon />, path: '/' },
   { text: 'Shops', icon: <StoreIcon />, path: '/shops' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];

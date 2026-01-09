@@ -66,6 +66,13 @@ items:
     homeCategory: Fridge
     shopAvailability: []
     id: c54f515f-4a4b-4139-8ceb-1845ae4c1006
+  - name: Frozen Fish
+    homeCategory: Fridge
+    shopAvailability:
+      - shopId: tesco
+      - shopId: sainsburys
+        shopCategory: Freezer
+    id: a934f7be-94a8-46ce-a614-ca6138a8b279
 shops:
   - id: sainsburys
     name: Sainsburys
@@ -75,6 +82,7 @@ shops:
       - Snacks
       - Cereals
       - Vegetables
+      - Freezer
   - id: tesco
     name: Tesco
     categories:
@@ -92,6 +100,7 @@ selection:
   - butter
   - digestives
   - c54f515f-4a4b-4139-8ceb-1845ae4c1006
+  - a934f7be-94a8-46ce-a614-ca6138a8b279
 homeCategories:
   - Fridge
   - Cupboard 1

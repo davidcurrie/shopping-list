@@ -49,16 +49,15 @@ npm run deploy
 1. Open the app in your browser
 2. Click "Create New File" to create a shopping list YAML file
 3. Choose a location for your file (optionally in a cloud-synced folder)
-4. Add items using the + button on the Home List view
 5. Add shops using the + button on the Shops view
-6. Go to Settings to configure item-shop mappings
+4. Add items using the + button on the Home view
 
 ### Managing Items and Shops
 
-**Home List (Main View)**
+**Home (Main View)**
 - Click the **+ button** (bottom-right) to add new items
 - Click the **edit icon** next to any item to edit or delete it
-- Items include: name, home category, and optional notes
+- Items include: name, shop availability, home category, and optional notes
 - New items are automatically selected
 
 **Shops View**
@@ -66,19 +65,14 @@ npm run deploy
 - Click the **edit icon** on any shop card to edit or delete it
 - Shops display how many items you need from each location
 
-**Settings > Item-Shop Mapping**
-- Select an item
-- Add which shops carry that item
-- Assign shop-specific categories (e.g., "Dairy" at Sainsburys)
-
 **Reordering Categories**
 - Use the **up/down arrow buttons** in category headers to reorder them
-- Works in both Home List and Shop views
+- Works in both Home and Shop views
 - Custom order is automatically saved to your YAML file
 
 ### At Home
 
-**Home List View**
+**Home View**
 - See all items organized by home categories
 - Check items you need to purchase
 - New items are automatically selected
@@ -94,10 +88,7 @@ npm run deploy
 
 ### Settings
 
-The Settings page has two tabs:
-
-1. **Item-Shop Mapping** - Configure which items are available at which shops and their categories
-2. **File Location** - Manage your YAML file (view, open, create, save)
+**File Location** - Manage your YAML file (view, open, create, save)
 
 ## File Format
 
@@ -142,7 +133,7 @@ A `test-data.yaml` file is included with sample items and shops. Use "Open File"
 src/
 ├── components/       # React components
 │   ├── layout/      # AppBar, AppDrawer, Layout
-│   ├── home/        # Home list view
+│   ├── home/        # Home view
 │   ├── shop/        # Shop views
 │   ├── settings/    # Settings tabs
 │   └── common/      # Shared components
@@ -244,8 +235,8 @@ If you get "Permission denied" errors:
 
 ### Items Not Appearing in Shop View
 
-- Make sure items are selected in the Home List view
-- Verify the item is mapped to that shop in Settings > Item-Shop Mapping
+- Make sure items are selected in the Home view
+- Verify the item is marked as available in that shop
 - Check that the item has a shop category assigned for that shop
 
 ## License

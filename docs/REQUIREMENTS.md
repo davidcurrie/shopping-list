@@ -68,7 +68,7 @@ The user should be able to select the location of the file so that, for example,
 ### User Interface
 
 - **Navigation**: Material UI drawer navigation (hamburger menu) with sections:
-  - Home List: View/edit items by home categories
+  - Home: View/edit items by home categories
   - Shops: Select a shop and view available items
   - Settings: Manage items, shops, and file location
 - **Mobile-first design**: Optimized for mobile device usage

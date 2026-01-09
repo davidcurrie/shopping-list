@@ -17,7 +17,7 @@ export function Layout({ children }: LayoutProps) {
   const getTitle = () => {
     switch (location.pathname) {
       case '/':
-        return 'Home List';
+        return 'Home';
       case '/shops':
         return 'Shops';
       case '/settings':

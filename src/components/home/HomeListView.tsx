@@ -346,7 +346,7 @@ export function HomeListView() {
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography variant="h5">
-            Home List
+            Home
             {selectedCount > 0 && (
               <Typography component="span" variant="h6" color="primary" sx={{ ml: 2 }}>
                 ({selectedCount} selected)
