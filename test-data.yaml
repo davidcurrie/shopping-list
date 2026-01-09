@@ -44,6 +44,7 @@ items:
     homeCategory: Cupboard 1
     shopAvailability:
       - shopId: sainsburys
+        shopCategory: Snacks
   - id: carrots
     name: Carrots
     homeCategory: Vegetable drawer
@@ -61,6 +62,10 @@ items:
         shopCategory: Vegetables
       - shopId: tesco
         shopCategory: Fresh Produce
+  - name: Ice Cream
+    homeCategory: Fridge
+    shopAvailability: []
+    id: c54f515f-4a4b-4139-8ceb-1845ae4c1006
 shops:
   - id: sainsburys
     name: Sainsburys
@@ -79,12 +84,14 @@ shops:
       - Fresh Produce
   - id: greengrocers
     name: Local Greengrocers
+    categories: []
 selection:
   - chicken
-  - digestives
   - carrots
   - porridge
   - butter
+  - digestives
+  - c54f515f-4a4b-4139-8ceb-1845ae4c1006
 homeCategories:
   - Fridge
   - Cupboard 1

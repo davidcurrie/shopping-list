@@ -28,6 +28,7 @@ import { ConfirmDialog } from '../common/ConfirmDialog';
 
 export function HomeListView() {
   const items = useShoppingStore((state) => state.items);
+  const shops = useShoppingStore((state) => state.shops);
   const selectedItemIds = useShoppingStore(
     (state) => state.selection
   );
@@ -37,6 +38,8 @@ export function HomeListView() {
   const addItem = useShoppingStore((state) => state.addItem);
   const updateItem = useShoppingStore((state) => state.updateItem);
   const deleteItem = useShoppingStore((state) => state.deleteItem);
+  const setItemShopAvailability = useShoppingStore((state) => state.setItemShopAvailability);
+  const removeItemFromShop = useShoppingStore((state) => state.removeItemFromShop);
   const loadData = useShoppingStore((state) => state.loadData);
   const setFileHandle = useShoppingStore((state) => state.setFileHandle);
   const fileHandle = useShoppingStore((state) => state.fileHandle);
@@ -49,6 +52,7 @@ export function HomeListView() {
     homeCategory: '',
     notes: '',
   });
+  const [selectedShopIds, setSelectedShopIds] = useState<string[]>([]);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [showUnselected, setShowUnselected] = useState(true);
 
@@ -100,6 +104,7 @@ export function HomeListView() {
   const handleAddItem = () => {
     setEditingItem(null);
     setFormData({ name: '', homeCategory: '', notes: '' });
+    setSelectedShopIds([]);
     setDialogOpen(true);
   };
 
@@ -110,6 +115,7 @@ export function HomeListView() {
       homeCategory: item.homeCategory,
       notes: item.notes || '',
     });
+    setSelectedShopIds(item.shopAvailability.map(a => a.shopId));
     setDialogOpen(true);
   };
 
@@ -119,18 +125,42 @@ export function HomeListView() {
     }
 
     if (editingItem) {
+      // Update basic item properties
       updateItem(editingItem.id, {
         name: formData.name.trim(),
         homeCategory: formData.homeCategory.trim(),
         notes: formData.notes.trim() || undefined,
       });
+
+      // Update shop availability
+      const currentShopIds = editingItem.shopAvailability.map(a => a.shopId);
+
+      // Remove from shops that were deselected
+      currentShopIds.forEach(shopId => {
+        if (!selectedShopIds.includes(shopId)) {
+          removeItemFromShop(editingItem.id, shopId);
+        }
+      });
+
+      // Add to newly selected shops (preserving existing categories)
+      selectedShopIds.forEach(shopId => {
+        const existing = editingItem.shopAvailability.find(a => a.shopId === shopId);
+        if (!existing) {
+          setItemShopAvailability(editingItem.id, shopId, undefined);
+        }
+      });
     } else {
-      addItem({
+      // Create new item
+      const newItem: Omit<Item, 'id'> = {
         name: formData.name.trim(),
         homeCategory: formData.homeCategory.trim(),
         notes: formData.notes.trim() || undefined,
-        shopAvailability: [],
-      });
+        shopAvailability: selectedShopIds.map(shopId => ({
+          shopId,
+          shopCategory: undefined,
+        })),
+      };
+      addItem(newItem);
     }
 
     setDialogOpen(false);
@@ -227,7 +257,7 @@ export function HomeListView() {
         </Fab>
 
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Add Item</DialogTitle>
+          <DialogTitle>{editingItem ? 'Edit Item' : 'Add Item'}</DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
@@ -258,6 +288,23 @@ export function HomeListView() {
                 />
               )}
             />
+            <Autocomplete
+              multiple
+              options={shops}
+              getOptionLabel={(option) => option.name}
+              value={shops.filter(shop => selectedShopIds.includes(shop.id))}
+              onChange={(_, newValue) => {
+                setSelectedShopIds(newValue.map(shop => shop.id));
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  margin="dense"
+                  label="Available at Shops"
+                  helperText="Select which shops carry this item"
+                />
+              )}
+            />
             <TextField
               margin="dense"
               label="Notes (optional)"
@@ -270,13 +317,23 @@ export function HomeListView() {
             />
           </DialogContent>
           <DialogActions>
+            {editingItem && (
+              <Button
+                onClick={() => setDeleteConfirm(editingItem.id)}
+                color="error"
+                startIcon={<DeleteIcon />}
+              >
+                Delete
+              </Button>
+            )}
+            <Box sx={{ flex: 1 }} />
             <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
             <Button
               onClick={handleSaveItem}
               variant="contained"
               disabled={!formData.name.trim() || !formData.homeCategory.trim()}
             >
-              Add
+              {editingItem ? 'Save' : 'Add'}
             </Button>
           </DialogActions>
         </Dialog>
