@@ -1,4 +1,48 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" fill="#1976d2"/>
-  <text x="50%" y="50%" font-size="200" text-anchor="middle" dy=".3em" fill="white" font-family="Arial, sans-serif" font-weight="bold">SL</text>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#1976d2" rx="64"/>
+
+  <!-- Paper with shadow -->
+  <g transform="translate(96, 64)">
+    <!-- Shadow -->
+    <rect x="8" y="8" width="312" height="400" fill="rgba(0,0,0,0.15)" rx="8"/>
+
+    <!-- Paper -->
+    <rect width="312" height="400" fill="white" rx="8"/>
+
+    <!-- List items -->
+    <!-- Item 1 with checkmark -->
+    <g transform="translate(32, 80)">
+      <!-- Checkbox background -->
+      <rect width="32" height="32" fill="#4caf50" rx="6"/>
+      <!-- Checkmark -->
+      <path d="M 8 16 L 14 22 L 24 10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+      <!-- Wiggly line -->
+      <path d="M 56 12 Q 80 8, 104 12 T 152 12 Q 176 16, 200 12 T 248 12"
+            stroke="#333" stroke-width="3" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Item 2 without checkmark -->
+    <g transform="translate(32, 160)">
+      <!-- Empty checkbox -->
+      <rect width="32" height="32" fill="none" stroke="#bbb" stroke-width="2" rx="6"/>
+
+      <!-- Wiggly line -->
+      <path d="M 56 12 Q 80 16, 104 12 T 152 12 Q 176 8, 200 12 T 248 12"
+            stroke="#333" stroke-width="3" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Item 3 with checkmark -->
+    <g transform="translate(32, 240)">
+      <!-- Checkbox background -->
+      <rect width="32" height="32" fill="#4caf50" rx="6"/>
+      <!-- Checkmark -->
+      <path d="M 8 16 L 14 22 L 24 10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+      <!-- Wiggly line (shorter) -->
+      <path d="M 56 12 Q 80 8, 104 12 T 152 12 Q 176 16, 200 12"
+            stroke="#333" stroke-width="3" stroke-linecap="round" fill="none"/>
+    </g>
+  </g>
 </svg>
