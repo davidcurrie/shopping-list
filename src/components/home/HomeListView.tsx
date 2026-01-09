@@ -12,6 +12,7 @@ import {
   Fab,
   FormControlLabel,
   Switch,
+  Autocomplete,
 } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import AddIcon from '@mui/icons-material/Add';
@@ -237,16 +238,25 @@ export function HomeListView() {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
             />
-            <TextField
-              margin="dense"
-              label="Home Category"
-              fullWidth
+            <Autocomplete
+              freeSolo
+              options={homeCategories || []}
               value={formData.homeCategory}
-              onChange={(e) =>
-                setFormData({ ...formData, homeCategory: e.target.value })
-              }
-              required
-              helperText="e.g., Fridge, Cupboard, Vegetable drawer"
+              onChange={(_, newValue) => {
+                setFormData({ ...formData, homeCategory: newValue || '' });
+              }}
+              onInputChange={(_, newInputValue) => {
+                setFormData({ ...formData, homeCategory: newInputValue });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  margin="dense"
+                  label="Home Category"
+                  required
+                  helperText="Select existing or type to create new"
+                />
+              )}
             />
             <TextField
               margin="dense"

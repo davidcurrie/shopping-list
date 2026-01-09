@@ -61,7 +61,7 @@ export function groupItemsByShopCategory(
     );
 
     if (availability) {
-      const category = availability.shopCategory;
+      const category = availability.shopCategory || 'Uncategorized';
       if (!categoryMap.has(category)) {
         categoryMap.set(category, []);
       }
@@ -75,10 +75,14 @@ export function groupItemsByShopCategory(
     items,
   }));
 
-  // Sort by custom order if provided, otherwise alphabetically
+  // Sort by custom order if provided, with Uncategorized always last
   const categories = shop.categories;
   if (categories && categories.length > 0) {
     return categoryGroups.sort((a, b) => {
+      // Uncategorized always comes last
+      if (a.name === 'Uncategorized') return 1;
+      if (b.name === 'Uncategorized') return -1;
+
       const indexA = categories.indexOf(a.name);
       const indexB = categories.indexOf(b.name);
 
@@ -96,7 +100,12 @@ export function groupItemsByShopCategory(
     });
   }
 
-  return categoryGroups.sort((a, b) => a.name.localeCompare(b.name));
+  // No custom order - sort alphabetically with Uncategorized last
+  return categoryGroups.sort((a, b) => {
+    if (a.name === 'Uncategorized') return 1;
+    if (b.name === 'Uncategorized') return -1;
+    return a.name.localeCompare(b.name);
+  });
 }
 
 /**
@@ -120,7 +129,7 @@ export function getUniqueShopCategories(
     const availability = item.shopAvailability.find(
       (avail) => avail.shopId === shopId
     );
-    if (availability) {
+    if (availability && availability.shopCategory) {
       categories.add(availability.shopCategory);
     }
   });

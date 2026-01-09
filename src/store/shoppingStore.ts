@@ -30,7 +30,7 @@ interface ShoppingStore extends ShoppingListData {
   setItemShopAvailability: (
     itemId: string,
     shopId: string,
-    category: string
+    category?: string
   ) => void;
   removeItemFromShop: (itemId: string, shopId: string) => void;
 
@@ -183,11 +183,16 @@ export const useShoppingStore = create<ShoppingStore>((set, get) => ({
           (avail) => avail.shopId !== shopId
         );
 
+        const newAvailability: { shopId: string; shopCategory?: string } = { shopId };
+        if (category) {
+          newAvailability.shopCategory = category;
+        }
+
         return {
           ...item,
           shopAvailability: [
             ...filteredAvailability,
-            { shopId, shopCategory: category },
+            newAvailability,
           ],
         };
       });

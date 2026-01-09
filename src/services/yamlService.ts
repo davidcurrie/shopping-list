@@ -79,9 +79,9 @@ export class YamlService {
             `Invalid item at index ${index}, shopAvailability at index ${availIndex}: shopId is required`
           );
         }
-        if (!avail.shopCategory || typeof avail.shopCategory !== 'string') {
+        if (avail.shopCategory !== undefined && typeof avail.shopCategory !== 'string') {
           throw new Error(
-            `Invalid item at index ${index}, shopAvailability at index ${availIndex}: shopCategory is required`
+            `Invalid item at index ${index}, shopAvailability at index ${availIndex}: shopCategory must be a string if provided`
           );
         }
       });

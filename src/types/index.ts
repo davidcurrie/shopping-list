@@ -9,7 +9,7 @@ export interface Item {
 
 export interface ShopAvailability {
   shopId: string;
-  shopCategory: string;
+  shopCategory?: string;
 }
 
 export interface Shop {

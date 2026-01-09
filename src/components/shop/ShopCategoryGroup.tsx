@@ -11,7 +11,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { ShopCategory } from '../../types';
+import { ShopCategory, Item } from '../../types';
 import { ShopItemRow } from './ShopItemRow';
 import { useShoppingStore } from '../../store/shoppingStore';
 
@@ -20,6 +20,7 @@ interface ShopCategoryGroupProps {
   shopId: string;
   selectedItemIds: string[];
   onToggleItem: (itemId: string) => void;
+  onEditItem?: (item: Item) => void;
   isFirst: boolean;
   isLast: boolean;
   defaultExpanded?: boolean;
@@ -30,6 +31,7 @@ export function ShopCategoryGroup({
   shopId,
   selectedItemIds,
   onToggleItem,
+  onEditItem,
   isFirst,
   isLast,
   defaultExpanded = true,
@@ -40,6 +42,8 @@ export function ShopCategoryGroup({
   const selectedCount = category.items.filter((item) =>
     selectedItemIds.includes(item.id)
   ).length;
+
+  const isUncategorized = category.name === 'Uncategorized';
 
   const handleMoveUp = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -64,24 +68,26 @@ export function ShopCategoryGroup({
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box>
-              <IconButton
-                size="small"
-                onClick={handleMoveUp}
-                disabled={isFirst}
-                sx={{ p: 0.5 }}
-              >
-                <ArrowUpwardIcon fontSize="small" />
-              </IconButton>
-              <IconButton
-                size="small"
-                onClick={handleMoveDown}
-                disabled={isLast}
-                sx={{ p: 0.5 }}
-              >
-                <ArrowDownwardIcon fontSize="small" />
-              </IconButton>
-            </Box>
+            {!isUncategorized && (
+              <Box>
+                <IconButton
+                  size="small"
+                  onClick={handleMoveUp}
+                  disabled={isFirst}
+                  sx={{ p: 0.5 }}
+                >
+                  <ArrowUpwardIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={handleMoveDown}
+                  disabled={isLast}
+                  sx={{ p: 0.5 }}
+                >
+                  <ArrowDownwardIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
             <Typography variant="h6">{category.name}</Typography>
           </Box>
           {selectedCount > 0 && (
@@ -101,6 +107,7 @@ export function ShopCategoryGroup({
               item={item}
               selected={selectedItemIds.includes(item.id)}
               onToggle={onToggleItem}
+              onEdit={onEditItem}
             />
           ))}
         </List>
