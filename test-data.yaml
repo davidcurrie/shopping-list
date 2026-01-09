@@ -1,0 +1,79 @@
+items:
+  - id: butter
+    name: Butter
+    homeCategory: Fridge
+    notes: Unsalted preferred
+    shopAvailability:
+      - shopId: sainsburys
+        shopCategory: Dairy
+      - shopId: tesco
+        shopCategory: Dairy
+  - id: cheese
+    name: Cheese
+    homeCategory: Fridge
+    shopAvailability:
+      - shopId: sainsburys
+        shopCategory: Dairy
+  - id: chicken
+    name: Chicken
+    homeCategory: Fridge
+    notes: Organic if available
+    shopAvailability:
+      - shopId: sainsburys
+        shopCategory: Meat
+      - shopId: tesco
+        shopCategory: Meat
+  - id: milk
+    name: Milk
+    homeCategory: Fridge
+    shopAvailability:
+      - shopId: sainsburys
+        shopCategory: Dairy
+      - shopId: tesco
+        shopCategory: Dairy
+  - id: porridge
+    name: Porridge
+    homeCategory: Cupboard 1
+    shopAvailability:
+      - shopId: sainsburys
+        shopCategory: Cereals
+      - shopId: tesco
+        shopCategory: Breakfast
+  - id: digestives
+    name: Digestives
+    homeCategory: Cupboard 1
+    shopAvailability:
+      - shopId: sainsburys
+        shopCategory: Snacks
+  - id: carrots
+    name: Carrots
+    homeCategory: Vegetable drawer
+    shopAvailability:
+      - shopId: greengrocers
+        shopCategory: Uncategorized
+      - shopId: sainsburys
+        shopCategory: Vegetables
+      - shopId: tesco
+        shopCategory: Fresh Produce
+  - id: potatoes
+    name: Potatoes
+    homeCategory: Vegetable drawer
+    shopAvailability:
+      - shopId: sainsburys
+        shopCategory: Vegetables
+      - shopId: tesco
+        shopCategory: Fresh Produce
+shops:
+  - id: sainsburys
+    name: Sainsburys
+  - id: tesco
+    name: Tesco
+  - id: greengrocers
+    name: Local Greengrocers
+selection:
+  selectedItemIds:
+    - chicken
+    - digestives
+    - carrots
+    - butter
+    - porridge
